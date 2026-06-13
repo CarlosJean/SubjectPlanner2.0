@@ -19,10 +19,11 @@ namespace MyApp.Namespace
         [HttpPost]
         public IActionResult GetEndDate(Subject subjectDto)
         {
-            double daysToAdd = _subjectService.GetDays(subjectDto ?? new Subject());
+            SubjectService.CalculationResult calculation = _subjectService.GetDays(subjectDto ?? new Subject());
 
             return Ok(new {
-                EndDate = subjectDto?.StartDate.AddDays(daysToAdd).ToString()
+                EndDate = calculation.EndDate.ToString(),
+                ClassDays = calculation.ClassDays.ToString(),
             });
         }
     }
