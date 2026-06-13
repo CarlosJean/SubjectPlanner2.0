@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  subjectplanner-api:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5000:80"
+    volumes: 
+      - .:/app
+      - /app/SubjectPlanner.Api/obj/
+      - /app/SubjectPlanner.Api/bin/
+    environment:
+      - DOTNET_USE_POLLING_FILE_WATCHER=1      
