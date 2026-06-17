@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SubjectPlanner.Api;
 using SubjectPlanner.Core;
+using SubjectPlanner.Core.Services;
 
 namespace MyApp.Namespace
 {
@@ -19,11 +18,12 @@ namespace MyApp.Namespace
         [HttpPost]
         public IActionResult GetEndDate(Subject subjectDto)
         {
-            SubjectService.CalculationResult calculation = _subjectService.GetDays(subjectDto ?? new Subject());
+            SubjectService.CalculationResult calculation = _subjectService.Calculate(subjectDto ?? new Subject());
 
             return Ok(new {
                 EndDate = calculation.EndDate.ToString(),
                 ClassDays = calculation.ClassDays.ToString(),
+                calculation.Holidays,
             });
         }
     }

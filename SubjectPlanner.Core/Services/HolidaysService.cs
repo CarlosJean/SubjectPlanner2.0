@@ -1,4 +1,3 @@
-using System.Timers;
 using Microsoft.Extensions.Configuration;
 using SubjectPlanner.Core.Helpers;
 
@@ -7,12 +6,12 @@ namespace SubjectPlanner.Core.Services;
 public class HolidaysService
 {
     private readonly IConfiguration _config;
-    private readonly List<Schedule> _schedules;
 
-    public HolidaysService(IConfiguration config, List<Schedule> schedules)
+    public List<Schedule>? Schedules { get; set; } = [];
+
+    public HolidaysService(IConfiguration config)
     {
         _config = config;
-        _schedules = schedules;
     }
 
     public List<Holiday> GetHolidays(DateTime dateFrom, DateTime dateTo)
@@ -40,9 +39,9 @@ public class HolidaysService
         }
 
         var k = holidays
-            .Where(h => _schedules
+            .Where(h => Schedules
                 .Select(s => s.Day)
-                .Contains(h.DayOfWeek))
+                .Contains(h.DayOfWeek) && h >= DateOnly.FromDateTime(dateFrom) && h <= DateOnly.FromDateTime(dateTo))
             .Select(h => new Holiday { Date = h, AffectingHours = AffectingHours(h) })
             .ToList();
 
@@ -76,7 +75,7 @@ public class HolidaysService
     }
 
     private double AffectingHours(DateOnly holiday) {
-        return _schedules
+        return Schedules
             .Where(s => s.Day == holiday.DayOfWeek)
             .Sum(s => (s.HourTo - s.HourFrom).Hours);
     }

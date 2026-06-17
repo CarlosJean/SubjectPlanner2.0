@@ -11,4 +11,4 @@ services:
       - /app/SubjectPlanner.Api/obj/
       - /app/SubjectPlanner.Api/bin/
     environment:
-      - DOTNET_USE_POLLING_FILE_WATCHER=1      
+      - DOTNET_USE_POLLING_FILE_WATCHER=1

@@ -1,8 +1,12 @@
-using SubjectPlanner.Core;
-
+namespace SubjectPlanner.Core.Services;
 public class SubjectService
 {
-    public CalculationResult GetDays(Subject subject)
+    private readonly HolidaysService _holidayService;
+
+    public SubjectService(HolidaysService holidaysService) {
+        _holidayService = holidaysService;
+    }
+    private CalculationResult GetDays(Subject subject)
     {
         //Ordenar los días de la semana
         subject.Schedules = subject?.Schedules?
@@ -78,25 +82,32 @@ public class SubjectService
         };
     }
 
-    private DateTime GetEndDate(double days, double fractionalWeeks, double hoursPerWeek, Subject subject, Schedule finalSchedule)
+    public CalculationResult Calculate(Subject subject)
     {
-        double hoursOnLastWeek = fractionalWeeks * hoursPerWeek % 1;
-        double passedHours = subject?.Schedules?.Where(s => s.Day < finalSchedule.Day).Sum(s => (s.HourTo - s.HourFrom).TotalHours) ?? 0;
+        CalculationResult calculation = new();
+        bool isThereHolidays = false;
+        double initialHours = subject.Hours;
+        double affectingHours = 0;
 
-        double finalDayTime = hoursOnLastWeek - passedHours;
+        do {
+            calculation = GetDays(subject);
+            _holidayService.Schedules = subject.Schedules;
+            List<Holiday> holidays = _holidayService.GetHolidays(subject.StartDate, calculation.EndDate);
+            double impactingHours = holidays.Sum(h => h.AffectingHours);
+            isThereHolidays =  impactingHours > affectingHours;
+            affectingHours += impactingHours;
+            subject.Hours = initialHours + impactingHours;
+            calculation.Holidays = holidays;
+            calculation.ClassDays -= holidays.Count;
+        } while (isThereHolidays);
 
-        TimeOnly endDateMinutes = finalSchedule.HourFrom.AddMinutes(finalDayTime * 60);
-
-        DateOnly date = DateOnly.FromDateTime(subject?.StartDate.AddDays(days) ?? new DateTime(0001, 01, 01));
-
-        DateTime endDate = new(date, endDateMinutes);
-
-        return endDate;
+        return calculation;
     }
 
     public class CalculationResult
     {
         public DateTime EndDate { get; set; }
         public int ClassDays { get; set; }
+        public List<Holiday> Holidays { get; set; } = [];
     }
 }
