@@ -2,7 +2,8 @@ using Microsoft.Extensions.Configuration;
 using SubjectPlanner.Core;
 using SubjectPlanner.Core.Services;
 
-public class SubjectServiceTests {
+public class SubjectServiceTests
+{
     private readonly IConfigurationRoot _config;
 
     public SubjectServiceTests()
@@ -12,11 +13,13 @@ public class SubjectServiceTests {
             .AddJsonFile("appsettings.test.json", false, true).Build();
     }
 
-    
+
     [Fact]
-    public void Calculate_Holiday_EndDateMovedToNewDate() {
+    public void Calculate_Holiday_EndDateMovedToNewDate()
+    {
         //Arrange
-        Subject subject = new() {
+        Subject subject = new()
+        {
             Hours = 15,
             StartDate = new DateTime(2017, 01, 16),
             Schedules = [
@@ -28,21 +31,60 @@ public class SubjectServiceTests {
             ]
         };
 
-        HolidaysService holidayService = new (_config)
+        HolidaysService holidayService = new(_config)
         {
             Schedules = subject.Schedules
         };
         SubjectService subjectService = new(holidayService);
         //End arrange
-     
+
         //Act
         SubjectService.CalculationResult calculationResult = subjectService.Calculate(subject);
         //End act
 
         //Assert
         Assert.Equal(
-            new DateTime(2017, 03, 13, 8, 59,59)
-                .ToString("yyyy-MM-dd HH:mm"), 
+            new DateTime(2017, 03, 13, 8, 59, 59)
+                .ToString("yyyy-MM-dd HH:mm"),
+            calculationResult
+                .EndDate
+                .ToString("yyyy-MM-dd HH:mm")
+        );
+        //End assert
+    }
+
+    [Fact]
+    public void Calculate_ClassEndsByHolyWeek_FinishesNextweek()
+    {
+        //Arrange
+        Subject subject = new()
+        {
+            Hours = 4,
+            StartDate = new DateTime(2017, 04, 5),
+            Schedules = [
+                new Schedule {
+                    Day = DayOfWeek.Wednesday,
+                    HourFrom = new TimeOnly(08, 00),
+                    HourTo = new TimeOnly(10, 00),
+                }
+            ]
+        };
+
+        HolidaysService holidayService = new(_config)
+        {
+            Schedules = subject.Schedules
+        };
+        SubjectService subjectService = new(holidayService);
+        //End arrange
+
+        //Act
+        SubjectService.CalculationResult calculationResult = subjectService.Calculate(subject);
+        //End act
+
+        //Assert
+        Assert.Equal(
+            new DateTime(2017, 04, 19, 10, 0, 0)
+                .ToString("yyyy-MM-dd HH:mm"),
             calculationResult
                 .EndDate
                 .ToString("yyyy-MM-dd HH:mm")
