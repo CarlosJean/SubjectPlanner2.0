@@ -12,6 +12,18 @@ class Schedule {
   }
 }
 
+class ScheduleRequest {
+  day:number;
+  hourFrom:string;
+  hourTo:string;
+
+  constructor(day:number, hourFrom:string, hourTo:string) {
+    this.day = day;
+    this.hourFrom = hourFrom;
+    this.hourTo = hourTo;
+  }
+}
+
 function App() {
   const [checkedOnes, setCheckedOnes] = useState<number[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
@@ -48,6 +60,16 @@ function App() {
   useEffect(() => {
     console.log(schedules);
   }, [schedules]);
+
+  const handleSendRequest = (): void => {
+    //Aquí se debe formar y enviar la solicitud
+    const request = schedules
+      .map(schedule => 
+        schedule.days
+          .map(day => new ScheduleRequest(day, schedule.hourFrom, schedule.hourTo)));
+          
+    console.log(request);    
+  }
 
   return (
     <>
@@ -107,6 +129,13 @@ function App() {
         onClick={handleOnClick}
       >
         Añadir
+      </button>
+      
+      <button
+        type="button"
+        onClick={handleSendRequest}
+      >
+        Enviar soliciutd
       </button>
     </>
   )
