@@ -62,6 +62,8 @@ public class HolidaysService
         Holiday holiday = new();
         DateOnly newDate = new(year, holidayConfig.Date.Month, holidayConfig.Date.Day);
 
+        if (holidayConfig.IsReligious || newDate.DayOfWeek == DayOfWeek.Monday) { return newDate; }
+
         if (!holidayConfig.IsReligious)
         {
             if (newDate == new DateOnly(newDate.Year, 05, 01) && newDate.DayOfWeek == DayOfWeek.Sunday)
@@ -76,9 +78,8 @@ public class HolidaysService
             {
                 holiday.Date = newDate.AddDays(7 - (int)newDate.DayOfWeek + 1);
             }
-        } else {
-            holiday.Date = newDate;
         }
+
         return holiday.Date;
     }
 

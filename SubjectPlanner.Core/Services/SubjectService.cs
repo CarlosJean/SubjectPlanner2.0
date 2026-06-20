@@ -14,9 +14,8 @@ public class SubjectService
             .ToList();
 
         //Cantidad de horas por semana
-        double hoursPerWeek = subject?
-            .Schedules?
-            .Sum(s => (s.HourTo - s.HourFrom).Hours) ?? 0;
+        List<Schedule> schedules = subject?.Schedules ?? [];
+        double hoursPerWeek = TotalHoursPerWeek(schedules);
 
         List<Schedule> firstWeekWorkingDays = subject?
             .Schedules?
@@ -37,6 +36,8 @@ public class SubjectService
 
         finalHours = Math.Ceiling(finalHours);
 
+        int classDays = ClassDays(subject ?? new Subject());
+
         for (int i = 0; i < subject?.Schedules?.Count; i++)
         {
             Schedule schedule = subject.Schedules[i];
@@ -44,12 +45,6 @@ public class SubjectService
             long hours = (schedule.HourTo - schedule.HourFrom).Hours;
 
             if (finalHours <= hours) {
-
-                double l = (subject?.Hours ?? 0)  / hoursPerWeek;
-                double m = l % 1;
-
-                int classDays = ( (int)l * subject.Schedules.Count ) + (int)Math.Ceiling(m * subject.Schedules.Count);
-
                 double passedHours = subject?.Schedules?.Where(s => s.Day < schedule.Day).Sum(s => (s.HourTo - s.HourFrom).TotalHours) ?? 0;
 
                 Schedule firstSchedule = subject?.Schedules.FirstOrDefault() ?? new Schedule();
@@ -74,18 +69,34 @@ public class SubjectService
             finalHours -= hours;
             Schedule nextSchedule = subject.Schedules[i + 1];
             days += nextSchedule.Day - schedule.Day;
-        }
-
+        }        
+        
         return new CalculationResult
         {
-            EndDate = subject?.StartDate ?? new DateTime(0001, 01, 01)
+            EndDate = subject?.StartDate ?? new DateTime(0001, 01, 01),
+            ClassDays = 0
         };
+    }
+
+    private int ClassDays(Subject subject) {
+        List<Schedule> schedules = subject?.Schedules ?? [];
+        double subjectHours = subject?.Hours ?? 0;
+
+        double totalHoursPerWeek = TotalHoursPerWeek(schedules);
+        double weeks = subjectHours / totalHoursPerWeek;
+
+        return (int)Math.Ceiling(weeks * schedules.Count);
+    }
+
+    private double TotalHoursPerWeek(List<Schedule> schedules) {
+        return schedules?
+            .Sum(s => (s.HourTo - s.HourFrom).Hours) ?? 0;
     }
 
     public CalculationResult Calculate(Subject subject)
     {
         CalculationResult calculation = new();
-        bool isThereHolidays = false;
+        bool isThereAnyHoliday = false;
         double initialHours = subject.Hours;
         double affectingHours = 0;
 
@@ -94,12 +105,12 @@ public class SubjectService
             _holidayService.Schedules = subject.Schedules;
             List<Holiday> holidays = _holidayService.GetHolidays(subject.StartDate, calculation.EndDate);
             double impactingHours = holidays.Sum(h => h.AffectingHours);
-            isThereHolidays =  impactingHours > affectingHours;
+            isThereAnyHoliday = impactingHours > affectingHours;
             affectingHours += impactingHours;
             subject.Hours = initialHours + impactingHours;
             calculation.Holidays = holidays;
             calculation.ClassDays -= holidays.Count;
-        } while (isThereHolidays);
+        } while (isThereAnyHoliday);
 
         return calculation;
     }

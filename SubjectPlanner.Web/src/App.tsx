@@ -13,12 +13,12 @@ class Schedule {
 }
 
 class ScheduleRequest {
-  day:number;
-  hourFrom:string;
-  hourTo:string;
+  day: number;
+  hourFrom: string;
+  hourTo: string;
 
-  constructor(day:number, hourFrom:string, hourTo:string) {
-    this.day = day;
+  constructor(day: number, hourFrom: string, hourTo: string) {
+    this.day = Number(day);
     this.hourFrom = hourFrom;
     this.hourTo = hourTo;
   }
@@ -27,6 +27,10 @@ class ScheduleRequest {
 function App() {
   const [checkedOnes, setCheckedOnes] = useState<number[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [hourFrom, setHourFrom] = useState("");
+  const [hourTo, setHourTo] = useState("");
+  const [hours, setHours] = useState("");
+  const [startDate, setStartDate] = useState("");
 
   function handleOnCheckBoxClick({ target }: any): void {
 
@@ -43,13 +47,16 @@ function App() {
   }
 
   const handleOnClick = () => {
+
+    console.log(hourFrom, hourTo);
+    
     let newSchedules: Schedule[] = schedules.map(s => {
       return new Schedule([...s.days.filter(x => !checkedOnes.includes(x))], s.hourFrom, s.hourTo);
     });
 
     newSchedules = [
       ...newSchedules,
-      new Schedule([...checkedOnes], "", "")
+      new Schedule([...checkedOnes], `${hourFrom}:00`, `${hourTo}:00`)
     ]
 
     newSchedules = newSchedules.filter(n => n.days.length > 0);
@@ -63,16 +70,75 @@ function App() {
 
   const handleSendRequest = (): void => {
     //Aquí se debe formar y enviar la solicitud
-    const request = schedules
-      .map(schedule => 
+    const scheduleRequest = schedules
+      .flatMap(schedule =>
         schedule.days
           .map(day => new ScheduleRequest(day, schedule.hourFrom, schedule.hourTo)));
-          
-    console.log(request);    
+
+    const request:any = {
+      hours: Number(hours),
+      startDate,
+      Schedules: scheduleRequest
+    };
+
+    console.log(request);
+    getData(request);    
+  }
+
+async function getData(request:any) {
+  const url = "http://localhost:5000/api/subjects";
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(request),
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log(result);
+  } catch (error:any) {
+    console.error(error.message);
+  }
+}
+
+  const handleOnTextChange = ({target}:any):void => {
+    console.log(target);
+    
+    switch (target.id) {
+      case "txTotalHours":
+        setHours(target.value);
+        break;
+      case "txtHourFrom":
+        setHourFrom(target.value);
+        break;
+      case "txtHourTo":
+        setHourTo(target.value);
+        break;
+      case "txtStartDate":
+        setStartDate(target.value);
+        break;
+    
+      default:
+        break;
+    }
   }
 
   return (
     <>
+      <label htmlFor="txTotalHours">Horas totales</label>
+      <input type="text" name="" id="txTotalHours" onChange={handleOnTextChange}/>
+      <label htmlFor="txtStartDate">Fecha de inicio</label>
+      <input type="date" name="" id="txtStartDate" onChange={handleOnTextChange}/>
+      <label htmlFor="txtHourFrom">Hora desde</label>
+      <input type="time" name="" id="txtHourFrom" onChange={handleOnTextChange}/>
+      <label htmlFor="txtHourTo">Hora hasta</label>
+      <input type="time" name="" id="txtHourTo" onChange={handleOnTextChange}/>
       <>
         <label htmlFor="1">L</label>
         <input
@@ -130,7 +196,7 @@ function App() {
       >
         Añadir
       </button>
-      
+
       <button
         type="button"
         onClick={handleSendRequest}

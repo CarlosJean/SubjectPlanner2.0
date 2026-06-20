@@ -13,7 +13,6 @@ public class SubjectServiceTests
             .AddJsonFile("appsettings.test.json", false, true).Build();
     }
 
-
     [Fact]
     public void Calculate_Holiday_EndDateMovedToNewDate()
     {
@@ -44,12 +43,14 @@ public class SubjectServiceTests
 
         //Assert
         Assert.Equal(
-            new DateTime(2017, 03, 13, 8, 59, 59)
+            new DateTime(2017, 03, 20, 8, 59, 59)
                 .ToString("yyyy-MM-dd HH:mm"),
             calculationResult
                 .EndDate
                 .ToString("yyyy-MM-dd HH:mm")
         );
+        
+        Assert.Equal(8, calculationResult.ClassDays);
         //End assert
     }
 
@@ -89,6 +90,47 @@ public class SubjectServiceTests
                 .EndDate
                 .ToString("yyyy-MM-dd HH:mm")
         );
+        //End assert
+    }
+
+    [Fact]
+    public void GetDays_OnlyOneClassHourTotal_ClassDaysOneAndSameStartDate()
+    {
+       //Arrange
+        Subject subject = new()
+        {
+            Hours = 1,
+            StartDate = new DateTime(2017, 04, 19),
+            Schedules = [
+                new Schedule {
+                    Day = DayOfWeek.Wednesday,
+                    HourFrom = new TimeOnly(08, 00),
+                    HourTo = new TimeOnly(10, 00),
+                }
+            ]
+        };
+
+        HolidaysService holidayService = new(_config)
+        {
+            Schedules = subject.Schedules
+        };
+        SubjectService subjectService = new(holidayService);
+        //End arrange
+
+        //Act
+        SubjectService.CalculationResult calculationResult = subjectService.Calculate(subject);
+        //End act
+
+        //Assert
+        Assert.Equal(
+            new DateTime(2017, 04, 19, 8, 59, 59)
+                .ToString("yyyy-MM-dd HH:mm"),
+            calculationResult
+                .EndDate
+                .ToString("yyyy-MM-dd HH:mm")
+        );
+
+        Assert.Equal(1, calculationResult.ClassDays);
         //End assert
     }
 }
