@@ -151,152 +151,156 @@ function App() {
 
   return (
     <>
-      <Card title="Información de la materia">
-        <Row>
-          <Col span={16}>
+      <Row gutter={6} style={{width: "50%"}}>
+        <Col span={16}>
+          <Card title="Información de la materia">
             <Row>
               <Col span={16}>
-                <label htmlFor="txTotalHours">Horas totales</label>
-              </Col>
-              <Col span={16}>
-                <InputNumber min={1} id="txTotalHours" onChange={handleOnTextChange} style={{ width: "100%" }}></InputNumber>
-              </Col>
-            </Row>
-          </Col>
-          <Col span={16}>
-            <Row>
-              <Col span={16}>
-                <label htmlFor="txtStartDate">Fecha de inicio</label>
-              </Col>
-              <Col span={16}>
-                <DatePicker id="txtStartDate" onChange={handleOnTextChange}></DatePicker>
-              </Col>
-            </Row>
-          </Col>
-          <Col span={16}>
-            <div>
-              {/* <label htmlFor="1">L</label> */}
-              <Checkbox
-                id="1"
-                onClick={handleOnCheckBoxClick}
-                type="checkbox"
-                value={1}>
-                L
-              </Checkbox>
-              <Checkbox
-                id="2"
-                onClick={handleOnCheckBoxClick}
-                type="checkbox"
-                value={2}>
-                M
-              </Checkbox>
-              <Checkbox
-                id="3"
-                onClick={handleOnCheckBoxClick}
-                type="checkbox"
-                value={3}>
-                X
-              </Checkbox>
-              <Checkbox
-                id="4"
-                onClick={handleOnCheckBoxClick}
-                type="checkbox"
-                value={4}>
-                J
-              </Checkbox>
-              <Checkbox
-                id="5"
-                onClick={handleOnCheckBoxClick}
-                type="checkbox"
-                value={5}>
-                V
-              </Checkbox>
-              <Checkbox
-                id="6"
-                onClick={handleOnCheckBoxClick}
-                type="checkbox"
-                value={6}>
-                S
-              </Checkbox>
-              <Checkbox
-                id="0"
-                onClick={handleOnCheckBoxClick}
-                type="checkbox"
-                value={0}>
-                D
-              </Checkbox>
-            </div>
-          </Col>
-          <Col span={16}>
-            <Row>
-              <Col>
                 <Row>
                   <Col span={16}>
-                    <label htmlFor="txtHourFrom">Hora desde</label>
+                    <label htmlFor="txTotalHours">Horas totales</label>
                   </Col>
                   <Col span={16}>
-                    <TimePicker mode="time" id="txtHourFrom" onChange={handleOnTextChange}></TimePicker>
+                    <InputNumber min={1} id="txTotalHours" onChange={handleOnTextChange} style={{ width: "100%" }}></InputNumber>
+                  </Col>
+                </Row>
+              </Col>
+              <Col span={16}>
+                <Row>
+                  <Col span={16}>
+                    <label htmlFor="txtStartDate">Fecha de inicio</label>
+                  </Col>
+                  <Col span={16}>
+                    <DatePicker id="txtStartDate" onChange={handleOnTextChange}></DatePicker>
+                  </Col>
+                </Row>
+              </Col>
+              <Col span={16}>
+                <div>
+                  {/* <label htmlFor="1">L</label> */}
+                  <Checkbox
+                    id="1"
+                    onClick={handleOnCheckBoxClick}
+                    type="checkbox"
+                    value={1}>
+                    L
+                  </Checkbox>
+                  <Checkbox
+                    id="2"
+                    onClick={handleOnCheckBoxClick}
+                    type="checkbox"
+                    value={2}>
+                    M
+                  </Checkbox>
+                  <Checkbox
+                    id="3"
+                    onClick={handleOnCheckBoxClick}
+                    type="checkbox"
+                    value={3}>
+                    X
+                  </Checkbox>
+                  <Checkbox
+                    id="4"
+                    onClick={handleOnCheckBoxClick}
+                    type="checkbox"
+                    value={4}>
+                    J
+                  </Checkbox>
+                  <Checkbox
+                    id="5"
+                    onClick={handleOnCheckBoxClick}
+                    type="checkbox"
+                    value={5}>
+                    V
+                  </Checkbox>
+                  <Checkbox
+                    id="6"
+                    onClick={handleOnCheckBoxClick}
+                    type="checkbox"
+                    value={6}>
+                    S
+                  </Checkbox>
+                  <Checkbox
+                    id="0"
+                    onClick={handleOnCheckBoxClick}
+                    type="checkbox"
+                    value={0}>
+                    D
+                  </Checkbox>
+                </div>
+              </Col>
+              <Col span={16}>
+                <Row>
+                  <Col>
+                    <Row>
+                      <Col span={16}>
+                        <label htmlFor="txtHourFrom">Hora desde</label>
+                      </Col>
+                      <Col span={16}>
+                        <TimePicker mode="time" id="txtHourFrom" onChange={handleOnTextChange}></TimePicker>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col>
+                    <Row>
+                      <Col span={16}>
+                        <label htmlFor="txtHourTo">Hora hasta</label>
+                      </Col>
+                      <Col span={16}>
+                        <TimePicker mode="time" id="txtHourTo" onChange={handleOnTextChange}></TimePicker>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <Col>
+                    <Button
+                      type="default"
+                      onClick={handleOnClick}
+                    >
+                      Añadir
+                    </Button>
                   </Col>
                 </Row>
               </Col>
               <Col>
-                <Row>
-                  <Col span={16}>
-                    <label htmlFor="txtHourTo">Hora hasta</label>
-                  </Col>
-                  <Col span={16}>
-                    <TimePicker mode="time" id="txtHourTo" onChange={handleOnTextChange}></TimePicker>
-                  </Col>
-                </Row>
-              </Col>
-              <Col>
-                <Button
-                  type="default"
-                  onClick={handleOnClick}
-                >
-                  Añadir
-                </Button>
+                <ul>
+                  {schedules
+                    .map((schedule, index) =>
+                    (<li key={index}>
+                      <p>{schedule.days.join(",")}</p>
+                      <p>{schedule.hourFrom} - {schedule.hourTo} <button onClick={() => handleOnRemoveSchedule(index)}>-</button></p>
+                    </li>))
+                  }
+                </ul>
               </Col>
             </Row>
-          </Col>
-          <Col>
+            <Button
+              type="primary"
+              onClick={handleSendRequest}
+            >
+              Obtener resultados
+            </Button>
+          </Card>
+        </Col>
+        <Col span={8} style={{height:"100%"}}>
+          <Card title="Resultados">
+            <legend>Resultados</legend>
+            <p>
+              Fecha de finalización <strong>{calculationResult.endDate}</strong>
+            </p>
+            <p>
+              Días de clases <strong>{calculationResult.classDays}</strong>
+            </p>
+
+            <p>Feriados</p>
             <ul>
-              {schedules
-                .map((schedule, index) =>
-                (<li key={index}>
-                  <p>{schedule.days.join(",")}</p>
-                  <p>{schedule.hourFrom} - {schedule.hourTo} <button onClick={() => handleOnRemoveSchedule(index)}>-</button></p>
-                </li>))
-              }
+              {(calculationResult.holidays.length === 0 && calculationResult.classDays > 0 && <p>No hay feriados que afecten.</p>)}
+              {calculationResult
+                .holidays
+                .map((holiday, index) => (<li key={index}>{holiday.date}</li>))}
             </ul>
-          </Col>
-        </Row>
-      </Card>
-
-      <Button
-        type="primary"
-        onClick={handleSendRequest}
-      >
-        Obtener resultados
-      </Button>
-
-      <Card title="Resultados">
-        <legend>Resultados</legend>
-        <p>
-          Fecha de finalización <strong>{calculationResult.endDate}</strong>
-        </p>
-        <p>
-          Días de clases <strong>{calculationResult.classDays}</strong>
-        </p>
-
-        <p>Feriados</p>
-        <ul>
-          {(calculationResult.holidays.length === 0 && calculationResult.classDays > 0 && <p>No hay feriados que afecten.</p>)}
-          {calculationResult
-            .holidays
-            .map((holiday, index) => (<li key={index}>{holiday.date}</li>))}
-        </ul>
-      </Card>
+          </Card>
+        </Col>
+      </Row>
     </>
   )
 }

@@ -1,6 +1,18 @@
 html, 
-body {
+body,
+#root {
   height: 100%;
   margin: 0;
   padding: 0;
+}
+
+#root {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body {
+  background-color: aliceblue;
 }
