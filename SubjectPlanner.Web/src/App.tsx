@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { Button, Card, Checkbox, Col, DatePicker, InputNumber, Row, TimePicker } from "antd";
+import { useState } from "react";
 
 class Schedule {
   days: number[];
@@ -135,107 +136,151 @@ function App() {
       case "txtStartDate":
         setStartDate(target.value);
         break;
-    
+
       default:
         break;
     }
   }
 
-  const handleOnRemoveSchedule = (scheduleIndex:number): void => {
+  const handleOnRemoveSchedule = (scheduleIndex: number): void => {
     setSchedules(
       schedules
-        .filter((_, index) => index != scheduleIndex )
+        .filter((_, index) => index != scheduleIndex)
     );
   }
 
   return (
     <>
-      <fieldset>
-        <label htmlFor="txTotalHours">Horas totales</label>
-        <input type="text" name="" id="txTotalHours" onChange={handleOnTextChange} />
-        <label htmlFor="txtStartDate">Fecha de inicio</label>
-        <input type="date" name="" id="txtStartDate" onChange={handleOnTextChange} />
-        <label htmlFor="txtHourFrom">Hora desde</label>
-        <input type="time" name="" id="txtHourFrom" onChange={handleOnTextChange} />
-        <label htmlFor="txtHourTo">Hora hasta</label>
-        <input type="time" name="" id="txtHourTo" onChange={handleOnTextChange} />
-        <>
-          <label htmlFor="1">L</label>
-          <input
-            id="1"
-            onClick={handleOnCheckBoxClick}
-            type="checkbox"
-            value={1}
-          />
-          <label htmlFor="2">M</label>
-          <input
-            id="2"
-            onClick={handleOnCheckBoxClick}
-            type="checkbox"
-            value={2}
-          />
-          <label htmlFor="3">X</label>
-          <input
-            id="3"
-            onClick={handleOnCheckBoxClick}
-            type="checkbox"
-            value={3}
-          />
-          <label htmlFor="4">J</label>
-          <input
-            id="4"
-            onClick={handleOnCheckBoxClick}
-            type="checkbox"
-            value={4}
-          />
-          <label htmlFor="5">V</label>
-          <input
-            id="5"
-            onClick={handleOnCheckBoxClick}
-            type="checkbox"
-            value={5}
-          />
-          <label htmlFor="6">S</label>
-          <input
-            id="6"
-            onClick={handleOnCheckBoxClick}
-            type="checkbox"
-            value={6}
-          />
-          <label htmlFor="7">D</label>
-          <input
-            id="7"
-            onClick={handleOnCheckBoxClick}
-            type="checkbox"
-            value={0}
-          />
-        </>
-        <button
-          type="button"
-          onClick={handleOnClick}
-        >
-          Añadir
-        </button>
+      <Card title="Información de la materia">
+        <Row>
+          <Col span={16}>
+            <Row>
+              <Col span={16}>
+                <label htmlFor="txTotalHours">Horas totales</label>
+              </Col>
+              <Col span={16}>
+                <InputNumber min={1} id="txTotalHours" onChange={handleOnTextChange} style={{ width: "100%" }}></InputNumber>
+              </Col>
+            </Row>
+          </Col>
+          <Col span={16}>
+            <Row>
+              <Col span={16}>
+                <label htmlFor="txtStartDate">Fecha de inicio</label>
+              </Col>
+              <Col span={16}>
+                <DatePicker id="txtStartDate" onChange={handleOnTextChange}></DatePicker>
+              </Col>
+            </Row>
+          </Col>
+          <Col span={16}>
+            <div>
+              {/* <label htmlFor="1">L</label> */}
+              <Checkbox
+                id="1"
+                onClick={handleOnCheckBoxClick}
+                type="checkbox"
+                value={1}>
+                L
+              </Checkbox>
+              <Checkbox
+                id="2"
+                onClick={handleOnCheckBoxClick}
+                type="checkbox"
+                value={2}>
+                M
+              </Checkbox>
+              <Checkbox
+                id="3"
+                onClick={handleOnCheckBoxClick}
+                type="checkbox"
+                value={3}>
+                X
+              </Checkbox>
+              <Checkbox
+                id="4"
+                onClick={handleOnCheckBoxClick}
+                type="checkbox"
+                value={4}>
+                J
+              </Checkbox>
+              <Checkbox
+                id="5"
+                onClick={handleOnCheckBoxClick}
+                type="checkbox"
+                value={5}>
+                V
+              </Checkbox>
+              <Checkbox
+                id="6"
+                onClick={handleOnCheckBoxClick}
+                type="checkbox"
+                value={6}>
+                S
+              </Checkbox>
+              <Checkbox
+                id="0"
+                onClick={handleOnCheckBoxClick}
+                type="checkbox"
+                value={0}>
+                D
+              </Checkbox>
+            </div>
+          </Col>
+          <Col span={16}>
+            <Row>
+              <Col>
+                <Row>
+                  <Col span={16}>
+                    <label htmlFor="txtHourFrom">Hora desde</label>
+                  </Col>
+                  <Col span={16}>
+                    <TimePicker mode="time" id="txtHourFrom" onChange={handleOnTextChange}></TimePicker>
+                  </Col>
+                </Row>
+              </Col>
+              <Col>
+                <Row>
+                  <Col span={16}>
+                    <label htmlFor="txtHourTo">Hora hasta</label>
+                  </Col>
+                  <Col span={16}>
+                    <TimePicker mode="time" id="txtHourTo" onChange={handleOnTextChange}></TimePicker>
+                  </Col>
+                </Row>
+              </Col>
+              <Col>
+                <Button
+                  type="default"
+                  onClick={handleOnClick}
+                >
+                  Añadir
+                </Button>
+              </Col>
+            </Row>
+          </Col>
+          <Col>
+            <ul>
+              {schedules
+                .map((schedule, index) =>
+                (<li key={index}>
+                  <p>{schedule.days.join(",")}</p>
+                  <p>{schedule.hourFrom} - {schedule.hourTo} <button onClick={() => handleOnRemoveSchedule(index)}>-</button></p>
+                </li>))
+              }
+            </ul>
+          </Col>
+        </Row>
+      </Card>
 
-        <ul>
-          {schedules
-            .map((schedule, index) =>
-            (<li key={index}>
-              <p>{schedule.days.join(",")}</p>
-              <p>{schedule.hourFrom} - {schedule.hourTo} <button onClick={() => handleOnRemoveSchedule(index)}>-</button></p>              
-            </li>))
-          }
-        </ul>
-      </fieldset>
-
-      <button
-        type="button"
+      <Button
+        type="primary"
         onClick={handleSendRequest}
       >
-        Enviar solicitud
-      </button>
+        Obtener resultados
+      </Button>
 
-      <fieldset>
+      <Card title="Resultados">
         <legend>Resultados</legend>
         <p>
           Fecha de finalización <strong>{calculationResult.endDate}</strong>
@@ -251,7 +296,7 @@ function App() {
             .holidays
             .map((holiday, index) => (<li key={index}>{holiday.date}</li>))}
         </ul>
-      </fieldset>
+      </Card>
     </>
   )
 }
