@@ -1,4 +1,4 @@
-import { Button, Card, Checkbox, Col, DatePicker, InputNumber, Row, TimePicker } from "antd";
+import { Button, Card, Checkbox, Col, DatePicker, Flex, InputNumber, Row, TimePicker } from "antd";
 import { useState } from "react";
 
 class Schedule {
@@ -151,33 +151,35 @@ function App() {
 
   return (
     <>
-      <Row gutter={6} style={{width: "50%"}}>
-        <Col span={16}>
-          <Card title="Información de la materia">
-            <Row>
-              <Col span={16}>
-                <Row>
-                  <Col span={16}>
-                    <label htmlFor="txTotalHours">Horas totales</label>
-                  </Col>
-                  <Col span={16}>
-                    <InputNumber min={1} id="txTotalHours" onChange={handleOnTextChange} style={{ width: "100%" }}></InputNumber>
-                  </Col>
-                </Row>
-              </Col>
-              <Col span={16}>
-                <Row>
-                  <Col span={16}>
-                    <label htmlFor="txtStartDate">Fecha de inicio</label>
-                  </Col>
-                  <Col span={16}>
-                    <DatePicker id="txtStartDate" onChange={handleOnTextChange}></DatePicker>
-                  </Col>
-                </Row>
-              </Col>
-              <Col span={16}>
-                <div>
-                  {/* <label htmlFor="1">L</label> */}
+      <Flex gap={"small"} justify="space-around" style={{ marginLeft: "5%", marginRight: "5%" }} wrap vertical>
+        <Card title="Información de la materia">
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Row gutter={16}>
+                <Col xs={24} sm={12}>
+                  <label htmlFor="txTotalHours">Horas totales</label>
+                  <InputNumber min={1} id="txTotalHours" onChange={handleOnTextChange} style={{ width: "100%" }}></InputNumber>
+                </Col>
+                <Col xs={24} sm={12}>
+                  <label htmlFor="txtStartDate">Fecha de inicio</label>
+                  <DatePicker id="txtStartDate" onChange={handleOnTextChange} style={{ width: "100%" }}></DatePicker>
+                </Col>
+                <Col>
+                  <ul>
+                    {schedules
+                      .map((schedule, index) =>
+                      (<li key={index}>
+                        <p>{schedule.days.join(",")}</p>
+                        <p>{schedule.hourFrom} - {schedule.hourTo} <button onClick={() => handleOnRemoveSchedule(index)}>-</button></p>
+                      </li>))
+                    }
+                  </ul>
+                </Col>
+              </Row>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Row gutter={16}>
+                <Col span={24}>
                   <Checkbox
                     id="1"
                     onClick={handleOnCheckBoxClick}
@@ -227,80 +229,60 @@ function App() {
                     value={0}>
                     D
                   </Checkbox>
-                </div>
-              </Col>
-              <Col span={16}>
-                <Row>
-                  <Col>
-                    <Row>
-                      <Col span={16}>
-                        <label htmlFor="txtHourFrom">Hora desde</label>
-                      </Col>
-                      <Col span={16}>
-                        <TimePicker mode="time" id="txtHourFrom" onChange={handleOnTextChange}></TimePicker>
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col>
-                    <Row>
-                      <Col span={16}>
-                        <label htmlFor="txtHourTo">Hora hasta</label>
-                      </Col>
-                      <Col span={16}>
-                        <TimePicker mode="time" id="txtHourTo" onChange={handleOnTextChange}></TimePicker>
-                      </Col>
-                    </Row>
-                  </Col>
-                  <Col>
+                </Col>
+                <Col span={8}>
+                  <label htmlFor="txtHourFrom">Hora desde</label>
+                  <TimePicker mode="time" id="txtHourFrom" onChange={handleOnTextChange}></TimePicker>
+                </Col>
+                <Col span={8}>
+                  <label htmlFor="txtHourTo">Hora hasta</label>
+                  <TimePicker mode="time" id="txtHourTo" onChange={handleOnTextChange}></TimePicker>
+                </Col>
+                <Col span={8}>
+                  <Flex align="start" justify="end" style={{ height: "100%" }} vertical>
                     <Button
                       type="default"
                       onClick={handleOnClick}
                     >
                       Añadir
                     </Button>
-                  </Col>
-                </Row>
-              </Col>
-              <Col>
-                <ul>
-                  {schedules
-                    .map((schedule, index) =>
-                    (<li key={index}>
-                      <p>{schedule.days.join(",")}</p>
-                      <p>{schedule.hourFrom} - {schedule.hourTo} <button onClick={() => handleOnRemoveSchedule(index)}>-</button></p>
-                    </li>))
-                  }
-                </ul>
-              </Col>
-            </Row>
-            <Button
-              type="primary"
-              onClick={handleSendRequest}
-            >
-              Obtener resultados
-            </Button>
-          </Card>
-        </Col>
-        <Col span={8} style={{height:"100%"}}>
-          <Card title="Resultados">
-            <legend>Resultados</legend>
-            <p>
-              Fecha de finalización <strong>{calculationResult.endDate}</strong>
-            </p>
-            <p>
-              Días de clases <strong>{calculationResult.classDays}</strong>
-            </p>
+                  </Flex>
+                </Col>
+              </Row>
+            </Col>
+            <Col xs={24}>
+              <Button
+                type="primary"
+                onClick={handleSendRequest}
+                style={{width: "100%"}}
+              >
+                Obtener resultados
+              </Button>
+            </Col>
+          </Row>
+        </Card>
 
-            <p>Feriados</p>
-            <ul>
-              {(calculationResult.holidays.length === 0 && calculationResult.classDays > 0 && <p>No hay feriados que afecten.</p>)}
-              {calculationResult
-                .holidays
-                .map((holiday, index) => (<li key={index}>{holiday.date}</li>))}
-            </ul>
-          </Card>
-        </Col>
-      </Row>
+        <Card title="Resultados">
+          <Row>
+            <Col>
+              <p>
+                Fecha de finalización <strong>{calculationResult.endDate}</strong>
+              </p>
+            </Col>
+          </Row>
+          <p>
+            Días de clases <strong>{calculationResult.classDays}</strong>
+          </p>
+
+          <p>Feriados</p>
+          <ul>
+            {(calculationResult.holidays.length === 0 && calculationResult.classDays > 0 && <p>No hay feriados que afecten.</p>)}
+            {calculationResult
+              .holidays
+              .map((holiday, index) => (<li key={index}>{holiday.date}</li>))}
+          </ul>
+        </Card>
+      </Flex>
     </>
   )
 }
