@@ -3,7 +3,6 @@ import { useState } from "react";
 import dayjs from 'dayjs';
 import 'dayjs/locale/es'; // Importa los datos del idioma español
 
-
 class Schedule {
   days: number[];
   hourFrom: string;
@@ -52,8 +51,6 @@ class CalculationResult {
 function App() {
   const [checkedOnes, setCheckedOnes] = useState<number[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
-  const [hourFrom, setHourFrom] = useState("");
-  const [hourTo, setHourTo] = useState("");
   const [timeRange, setTimeRange] = useState<any>([]);
   const [hours, setHours] = useState(0);
   const [startDate, setStartDate] = useState("");
@@ -159,7 +156,6 @@ function App() {
   }
 
   const handleOnTimePickerChange = (dates: any) => {
-
     if (dates == null) { setTimeRange([null, null]); return; }
 
     const [hourFrom, hourTo] = dates;
@@ -168,7 +164,6 @@ function App() {
       hourFrom,
       hourTo
     ]);
-
   }
 
   const handleOnClickClearAll = (): void => {
@@ -176,6 +171,7 @@ function App() {
     setHours(0);
     setSchedules([]);
     setStartDate("");
+    setCalculationResult({...calculationResult, classDays:0})
   }
 
   return (
@@ -330,8 +326,8 @@ function App() {
                 <Col span={24}>
                   <Button
                     onClick={handleOnClickClearAll}
-                    style={{width: "100%"}}
-                    >
+                    style={{ width: "100%" }}
+                  >
                     Limpiar todo
                   </Button>
                 </Col>
@@ -348,27 +344,29 @@ function App() {
             </Col>
           </Row >
         </Card >
+        {
+          (calculationResult.classDays > 0) &&
+          <Card title="Resultados" className={(loadingResults) ? "loading" : ""}>
+            <Row>
+              <Col>
+                <p>
+                  Fecha de finalización <strong>{dayjs(calculationResult.endDate).format("DD/MM/YYYY HH:mm:ss")}</strong>
+                </p>
+              </Col>
+            </Row>
+            <p>
+              Días de clases <strong>{calculationResult.classDays}</strong>
+            </p>
 
-        <Card title="Resultados" className={(loadingResults) ? "loading" : ""}>
-          <Row>
-            <Col>
-              <p>
-                Fecha de finalización <strong>{dayjs(calculationResult.endDate).format("DD/MM/YYYY HH:mm:ss")}</strong>
-              </p>
-            </Col>
-          </Row>
-          <p>
-            Días de clases <strong>{calculationResult.classDays}</strong>
-          </p>
-
-          <p>Feriados</p>
-          <ul>
-            {(calculationResult.holidays.length === 0 && calculationResult.classDays > 0 && <p>No hay feriados que afecten.</p>)}
-            {calculationResult
-              .holidays
-              .map((holiday, index) => (<li key={index}>{holiday.date}</li>))}
-          </ul>
-        </Card>
+            <p>Feriados</p>
+            <ul>
+              {(calculationResult.holidays.length === 0 && calculationResult.classDays > 0 && <p>No hay feriados que afecten.</p>)}
+              {calculationResult
+                .holidays
+                .map((holiday, index) => (<li key={index}>{holiday.date}</li>))}
+            </ul>
+          </Card>
+        }
       </Flex >
     </>
   )
