@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "antd": "^6.4.5",
+    "bootstrap": "^5.3.8",
+    "dayjs": "^1.11.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

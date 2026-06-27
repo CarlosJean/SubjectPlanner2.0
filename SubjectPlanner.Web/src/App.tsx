@@ -1,15 +1,18 @@
 import { Button, Card, Checkbox, Col, DatePicker, Flex, InputNumber, Row, TimePicker } from "antd";
 import { useState } from "react";
+import dayjs from 'dayjs';
+import 'dayjs/locale/es'; // Importa los datos del idioma español
+
 
 class Schedule {
   days: number[];
   hourFrom: string;
   hourTo: string;
 
-  constructor(days: number[], hourFrom: string, hourTo: string) {
+  constructor(days: number[], hourFrom: string, hourTo: string) {    
     this.days = days;
-    this.hourFrom = hourFrom;
-    this.hourTo = hourTo;
+    this.hourFrom = dayjs(hourFrom, "HH:mm").format('HH:mm');
+    this.hourTo = dayjs(hourTo, "HH:mm").format('HH:mm');
   }
 }
 
@@ -20,8 +23,8 @@ class ScheduleRequest {
 
   constructor(day: number, hourFrom: string, hourTo: string) {
     this.day = Number(day);
-    this.hourFrom = hourFrom;
-    this.hourTo = hourTo;
+    this.hourFrom = dayjs(hourFrom, 'HH:mm').format("HH:mm:ss").toString();
+    this.hourTo = dayjs(hourTo, 'HH:mm').format("HH:mm:ss").toString();
   }
 }
 
@@ -51,20 +54,19 @@ function App() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [hourFrom, setHourFrom] = useState("");
   const [hourTo, setHourTo] = useState("");
-  const [hours, setHours] = useState("");
+  const [hours, setHours] = useState(0);
   const [startDate, setStartDate] = useState("");
   const [calculationResult, setCalculationResult] = useState<CalculationResult>(new CalculationResult("", 0, []));
 
-  function handleOnCheckBoxClick({ target }: any): void {
-
+  function handleOnCheckBoxClick(value: number, { target }: any): void {
     if (target.checked) {
       setCheckedOnes([
         ...checkedOnes,
-        target.value
+        value
       ]);
     } else {
       setCheckedOnes([
-        ...checkedOnes.filter(c => c != target.value)
+        ...checkedOnes.filter(c => c != value)
       ]);
     }
   }
@@ -76,7 +78,7 @@ function App() {
 
     newSchedules = [
       ...newSchedules,
-      new Schedule([...checkedOnes], `${hourFrom}:00`, `${hourTo}:00`)
+      new Schedule([...checkedOnes], `${hourFrom}`, `${hourTo}`)
     ]
 
     newSchedules = newSchedules.filter(n => n.days.length > 0);
@@ -122,25 +124,26 @@ function App() {
     }
   }
 
-  const handleOnTextChange = ({ target }: any): void => {
-    switch (target.id) {
-      case "txTotalHours":
-        setHours(target.value);
-        break;
+  const handleOnTextChange = (totalHours: any): void => {
+    setHours(totalHours);
+  }
+
+  const handleOnDateChange = (dateString: any, target: string): void => {
+    switch (target) {
       case "txtHourFrom":
-        setHourFrom(target.value);
+        setHourFrom(dateString.toString());
         break;
       case "txtHourTo":
-        setHourTo(target.value);
+        setHourTo(dateString.toString());
         break;
       case "txtStartDate":
-        setStartDate(target.value);
+        setStartDate(dateString.toString());
         break;
-
       default:
         break;
     }
   }
+
 
   const handleOnRemoveSchedule = (scheduleIndex: number): void => {
     setSchedules(
@@ -149,94 +152,113 @@ function App() {
     );
   }
 
+  const getFormattedSchedule = (days:number[]) : string => {
+    dayjs.locale("es");
+
+    return days.map(day => dayjs().day(day).format('dd')).join(', ')
+  }; 
+
+
   return (
     <>
-      <Flex gap={"small"} justify="space-around" style={{ marginLeft: "5%", marginRight: "5%" }} wrap vertical>
+      <Flex gap={"small"} justify="space-around" style={{ marginLeft: "10%", marginRight: "10%" }} wrap vertical>
         <Card title="Información de la materia">
           <Row gutter={16}>
             <Col xs={24} sm={12}>
               <Row gutter={16}>
                 <Col xs={24} sm={12}>
                   <label htmlFor="txTotalHours">Horas totales</label>
-                  <InputNumber min={1} id="txTotalHours" onChange={handleOnTextChange} style={{ width: "100%" }}></InputNumber>
+                  <InputNumber min={1} id="txTotalHours" onChange={(totalHours) => handleOnTextChange(totalHours)} style={{ width: "100%" }}></InputNumber>
                 </Col>
                 <Col xs={24} sm={12}>
                   <label htmlFor="txtStartDate">Fecha de inicio</label>
-                  <DatePicker id="txtStartDate" onChange={handleOnTextChange} style={{ width: "100%" }}></DatePicker>
+                  <DatePicker id="txtStartDate" onChange={(_, dateString = '') => handleOnDateChange(dateString, 'txtStartDate')} style={{ width: "100%" }} placeholder="Seleccione una fecha" format={"DD/MM/YYYY"}></DatePicker>
                 </Col>
-                <Col>
-                  <ul>
+                <Col span={24}>
+                  <Row gutter={16}>
                     {schedules
                       .map((schedule, index) =>
-                      (<li key={index}>
-                        <p>{schedule.days.join(",")}</p>
-                        <p>{schedule.hourFrom} - {schedule.hourTo} <button onClick={() => handleOnRemoveSchedule(index)}>-</button></p>
-                      </li>))
+                      (<Col span={8} key={index}>
+                        <Card title={getFormattedSchedule(schedule.days)}>
+                          <Row gutter={16}>
+                            <Col span={24}>{schedule.hourFrom} - {schedule.hourTo}</Col>
+                            <Col span={24}>
+                              <Button color="danger" variant="dashed" onClick={() => handleOnRemoveSchedule(index)} style={{ width: "100%" }}>-</Button>
+                            </Col>
+                          </Row>
+                        </Card>
+                      </Col>
+                      ))
                     }
-                  </ul>
+                  </Row>
                 </Col>
               </Row>
             </Col>
             <Col xs={24} sm={12}>
-              <Row gutter={16}>
+              <Row gutter={8}>
                 <Col span={24}>
                   <Checkbox
                     id="1"
-                    onClick={handleOnCheckBoxClick}
-                    type="checkbox"
-                    value={1}>
+                    onChange={(e) => handleOnCheckBoxClick(1, e)}
+                    type="checkbox">
                     L
                   </Checkbox>
                   <Checkbox
                     id="2"
-                    onClick={handleOnCheckBoxClick}
-                    type="checkbox"
-                    value={2}>
+                    onChange={(e) => handleOnCheckBoxClick(2, e)}
+                    type="checkbox">
                     M
                   </Checkbox>
                   <Checkbox
                     id="3"
-                    onClick={handleOnCheckBoxClick}
-                    type="checkbox"
-                    value={3}>
+                    onChange={(e) => handleOnCheckBoxClick(3, e)}
+                    type="checkbox">
                     X
                   </Checkbox>
                   <Checkbox
                     id="4"
-                    onClick={handleOnCheckBoxClick}
-                    type="checkbox"
-                    value={4}>
+                    onChange={(e) => handleOnCheckBoxClick(4, e)}
+                    type="checkbox">
                     J
                   </Checkbox>
                   <Checkbox
                     id="5"
-                    onClick={handleOnCheckBoxClick}
-                    type="checkbox"
-                    value={5}>
+                    onChange={(e) => handleOnCheckBoxClick(5, e)}
+                    type="checkbox">
                     V
                   </Checkbox>
                   <Checkbox
                     id="6"
-                    onClick={handleOnCheckBoxClick}
-                    type="checkbox"
-                    value={6}>
+                    onChange={(e) => handleOnCheckBoxClick(6, e)}
+                    type="checkbox">
                     S
                   </Checkbox>
                   <Checkbox
                     id="0"
-                    onClick={handleOnCheckBoxClick}
-                    type="checkbox"
-                    value={0}>
+                    onChange={(e) => handleOnCheckBoxClick(0, e)}
+                    type="checkbox">
                     D
                   </Checkbox>
                 </Col>
                 <Col span={8}>
-                  <label htmlFor="txtHourFrom">Hora desde</label>
-                  <TimePicker mode="time" id="txtHourFrom" onChange={handleOnTextChange}></TimePicker>
+                  <Row>
+                    <Col span={24}>
+                      <label htmlFor="txtHourFrom">Hora desde</label>
+                    </Col>
+                    <Col span={24}>
+                      <TimePicker mode="time" id="txtHourFrom" onChange={(_, dateString) => handleOnDateChange(dateString, 'txtHourFrom')} placeholder="Seleccione una hora" format={"HH:mm"}></TimePicker>
+                    </Col>
+                  </Row>
                 </Col>
                 <Col span={8}>
-                  <label htmlFor="txtHourTo">Hora hasta</label>
-                  <TimePicker mode="time" id="txtHourTo" onChange={handleOnTextChange}></TimePicker>
+                  <Row>
+                    <Col span={24}>
+                      <label htmlFor="txtHourTo">Hora hasta</label>
+                    </Col>
+                    <Col span={24}>
+                      <TimePicker mode="time" id="txtHourTo" onChange={(_, dateString) => handleOnDateChange(dateString, 'txtHourTo')} placeholder="Seleccione una hora" format={"HH:mm"}></TimePicker>
+                    </Col>
+                  </Row>
                 </Col>
                 <Col span={8}>
                   <Flex align="start" justify="end" style={{ height: "100%" }} vertical>
@@ -254,7 +276,7 @@ function App() {
               <Button
                 type="primary"
                 onClick={handleSendRequest}
-                style={{width: "100%"}}
+                style={{ width: "100%" }}
               >
                 Obtener resultados
               </Button>
