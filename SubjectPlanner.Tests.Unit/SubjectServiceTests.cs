@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using SubjectPlanner.Core;
+using SubjectPlanner.Core.Helpers;
 using SubjectPlanner.Core.Services;
 
 public class SubjectServiceTests
@@ -38,7 +39,7 @@ public class SubjectServiceTests
         //End arrange
 
         //Act
-        SubjectService.CalculationResult calculationResult = subjectService.Calculate(subject);
+        CalculationResult calculationResult = subjectService.Calculate(subject);
         //End act
 
         //Assert
@@ -49,7 +50,7 @@ public class SubjectServiceTests
                 .EndDate
                 .ToString("yyyy-MM-dd HH:mm")
         );
-        
+
         Assert.Equal(8, calculationResult.ClassDays);
         //End assert
     }
@@ -79,7 +80,7 @@ public class SubjectServiceTests
         //End arrange
 
         //Act
-        SubjectService.CalculationResult calculationResult = subjectService.Calculate(subject);
+        CalculationResult calculationResult = subjectService.Calculate(subject);
         //End act
 
         //Assert
@@ -96,7 +97,7 @@ public class SubjectServiceTests
     [Fact]
     public void GetDays_OnlyOneClassHourTotal_ClassDaysOneAndSameStartDate()
     {
-       //Arrange
+        //Arrange
         Subject subject = new()
         {
             Hours = 1,
@@ -118,7 +119,7 @@ public class SubjectServiceTests
         //End arrange
 
         //Act
-        SubjectService.CalculationResult calculationResult = subjectService.Calculate(subject);
+        CalculationResult calculationResult = subjectService.Calculate(subject);
         //End act
 
         //Assert
@@ -132,5 +133,36 @@ public class SubjectServiceTests
 
         Assert.Equal(1, calculationResult.ClassDays);
         //End assert
+    }
+
+    [Fact]
+    public void Calculate_LessThanCeroHours_Exception()
+    {
+        //Arrange
+        Subject subject = new()
+        {
+            Hours = -1,
+            StartDate = new DateTime(2017, 04, 19),
+            Schedules = [
+                new Schedule {
+                    Day = DayOfWeek.Wednesday,
+                    HourFrom = new TimeOnly(08, 00),
+                    HourTo = new TimeOnly(10, 00),
+                }
+            ]
+        };
+
+        HolidaysService holidayService = new(_config)
+        {
+            Schedules = subject.Schedules
+        };
+        SubjectService subjectService = new(holidayService);
+        //End arrange
+
+        CalculationResult result = subjectService.Calculate(subject);
+
+        Assert.Equal(subject.StartDate, result.EndDate);
+        Assert.Equal(0, result.ClassDays);
+        Assert.Equal([], result.Holidays);
     }
 }

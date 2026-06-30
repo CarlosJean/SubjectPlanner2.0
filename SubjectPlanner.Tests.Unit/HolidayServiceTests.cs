@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using SubjectPlanner.Core;
+using SubjectPlanner.Core.Helpers;
 using SubjectPlanner.Core.Services;
 
 public class HolidayServiceTests
@@ -32,7 +33,7 @@ public class HolidayServiceTests
         {
             Schedules = schedules
         };
-        List<Holiday> holidays =  holidaysService.GetHolidays(subjectStartDate, subjectEndDate);
+        List<SubjectPlanner.Core.Helpers.Holiday> holidays =  holidaysService.GetHolidays(subjectStartDate, subjectEndDate);
 
         Assert.Empty(holidays);
     }
@@ -56,7 +57,7 @@ public class HolidayServiceTests
         {
             Schedules = schedules
         };
-        List<Holiday> holidays = holidaysService.GetHolidays(subjectStartDate, subjectEndDate);
+        List<SubjectPlanner.Core.Helpers.Holiday> holidays = holidaysService.GetHolidays(subjectStartDate, subjectEndDate);
 
         Assert.NotEmpty(holidays);
     }

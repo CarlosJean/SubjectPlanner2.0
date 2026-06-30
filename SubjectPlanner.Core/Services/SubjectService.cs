@@ -1,5 +1,7 @@
+using SubjectPlanner.Core.Helpers;
+
 namespace SubjectPlanner.Core.Services;
-public class SubjectService
+public partial class SubjectService
 {
     private readonly HolidaysService _holidayService;
 
@@ -8,6 +10,8 @@ public class SubjectService
     }
     private CalculationResult GetDays(Subject subject)
     {
+        if (subject.Hours < 0) return new CalculationResult{ ClassDays = 0, EndDate = subject.StartDate, Holidays = []};
+
         //Ordenar los días de la semana
         subject.Schedules = subject?.Schedules?
             .OrderBy(s => s.Day)?
@@ -113,12 +117,5 @@ public class SubjectService
         } while (isThereAnyHoliday);
 
         return calculation;
-    }
-
-    public class CalculationResult
-    {
-        public DateTime EndDate { get; set; }
-        public int ClassDays { get; set; }
-        public List<Holiday> Holidays { get; set; } = [];
     }
 }

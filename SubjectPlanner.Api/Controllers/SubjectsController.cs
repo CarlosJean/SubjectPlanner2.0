@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using SubjectPlanner.Core;
+using SubjectPlanner.Core.Helpers;
 using SubjectPlanner.Core.Services;
 
-namespace MyApp.Namespace
+namespace SubjectPlanner.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -18,7 +19,7 @@ namespace MyApp.Namespace
         [HttpPost]
         public IActionResult GetEndDate(Subject subjectDto)
         {
-            SubjectService.CalculationResult calculation = _subjectService.Calculate(subjectDto ?? new Subject());
+            CalculationResult calculation = _subjectService.Calculate(subjectDto ?? new Subject());
 
             return Ok(new {
                 EndDate = calculation.EndDate.ToString(),

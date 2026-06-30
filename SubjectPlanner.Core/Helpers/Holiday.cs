@@ -1,4 +1,4 @@
-namespace SubjectPlanner.Core.Services;
+namespace SubjectPlanner.Core.Helpers;
 
 public class Holiday {
     public DateOnly Date { get; set; }

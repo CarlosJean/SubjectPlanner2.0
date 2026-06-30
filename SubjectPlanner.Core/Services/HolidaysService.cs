@@ -15,7 +15,7 @@ public class HolidaysService
         _config = config;
     }
 
-    public List<Holiday> GetHolidays(DateTime dateFrom, DateTime dateTo)
+    public List<Helpers.Holiday> GetHolidays(DateTime dateFrom, DateTime dateTo)
     {
         List<DateOnly> holidays = [];
 
@@ -51,7 +51,7 @@ public class HolidaysService
             .Where(h => Schedules
                 .Select(s => s.Day)
                 .Contains(h.DayOfWeek) && h >= DateOnly.FromDateTime(dateFrom) && h <= DateOnly.FromDateTime(dateTo))
-            .Select(h => new Holiday { Date = h, AffectingHours = AffectingHours(h) })
+            .Select(h => new Helpers.Holiday { Date = h, AffectingHours = AffectingHours(h) })
             .ToList();
 
         return k;
@@ -59,7 +59,7 @@ public class HolidaysService
     
     private DateOnly HolidayDate(HolidaysConfig holidayConfig, int year)
     {
-        Holiday holiday = new();
+        Helpers.Holiday holiday = new();
         DateOnly newDate = new(year, holidayConfig.Date.Month, holidayConfig.Date.Day);
 
         if (holidayConfig.IsReligious || newDate.DayOfWeek == DayOfWeek.Monday) { return newDate; }
