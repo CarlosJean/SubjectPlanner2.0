@@ -3,6 +3,8 @@ import { useState } from "react";
 import dayjs from 'dayjs';
 import 'dayjs/locale/es'; // Importa los datos del idioma español
 
+const baseUrl:string = import.meta.env.VITE_API_BASE_URL;
+
 class Schedule {
   days: number[];
   hourFrom: string;
@@ -107,7 +109,7 @@ function App() {
   }
 
   const getData = async (request: any) => {
-    const url = "http://localhost:5000/api/subjects";
+    const url = `${baseUrl}/api/subjects`;
     try {
       const response = await fetch(url, {
         method: "POST",

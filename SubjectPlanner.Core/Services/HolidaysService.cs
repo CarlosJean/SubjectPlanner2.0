@@ -25,7 +25,7 @@ public class HolidaysService
         {
             int year = dateFrom.Year + i;
             List<HolidaysConfig> configHolidays = _config
-                .GetSection("holidays")
+                .GetSection("Holidays")
                         .Get<List<HolidaysConfig>>() ?? [];
 
             List<DateOnly> l =
