@@ -19,13 +19,23 @@ namespace SubjectPlanner.Api.Controllers
         [HttpPost]
         public IActionResult GetEndDate(Subject subjectDto)
         {
-            CalculationResult calculation = _subjectService.Calculate(subjectDto ?? new Subject());
+            try {
+                if (subjectDto.Hours < 0) return BadRequest(new CalculationResult{ ClassDays = 0, EndDate = subjectDto.StartDate, Holidays = []});
 
-            return Ok(new {
-                EndDate = calculation.EndDate.ToString(),
-                ClassDays = calculation.ClassDays.ToString(),
-                calculation.Holidays,
-            });
+                CalculationResult calculation = _subjectService.Calculate(subjectDto ?? new Subject());
+
+                return Ok(new {
+                    Ok = true,
+                    EndDate = calculation.EndDate.ToString(),
+                    ClassDays = calculation.ClassDays.ToString(),
+                    calculation.Holidays,
+                });
+            } catch (System.Exception ex) {
+                return BadRequest(new {
+                    Ok = false,
+                    ex.Message
+                });
+            }
         }
     }
 }
