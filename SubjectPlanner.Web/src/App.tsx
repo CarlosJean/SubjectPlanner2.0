@@ -1,4 +1,4 @@
-import { Button, Card, Checkbox, Col, DatePicker, Flex, InputNumber, Row, TimePicker } from "antd";
+import { Button, Card, Checkbox, Col, DatePicker, Flex, InputNumber, message, Row, TimePicker } from "antd";
 import { useState } from "react";
 import dayjs from 'dayjs';
 import 'dayjs/locale/es'; // Importa los datos del idioma español
@@ -58,6 +58,7 @@ function App() {
   const [startDate, setStartDate] = useState("");
   const [calculationResult, setCalculationResult] = useState<CalculationResult>(new CalculationResult("01/01/0001 00:00:00", 0, []));
   const [loadingResults, setLoadingResults] = useState(false);
+  const [messageApi, contextHolder] = message.useMessage();
 
   function handleOnCheckBoxClick(value: number, { target }: any): void {
     if (target.checked) {
@@ -120,12 +121,19 @@ function App() {
       });
 
       if (!response.ok) {
+        messageApi.open({
+          type: "error",
+          content: "Ocurrio un error durante la operación."
+        })
         throw new Error(`Response status: ${response.status}`);
       }
 
       return await response.json();
     } catch (error: any) {
-      console.error(error.message);
+      messageApi.open({
+        type: "error",
+        content: "Ocurrio un error durante la operación."
+      });
     }
   }
 
@@ -173,11 +181,12 @@ function App() {
     setHours(0);
     setSchedules([]);
     setStartDate("");
-    setCalculationResult({...calculationResult, classDays:0})
+    setCalculationResult({ ...calculationResult, classDays: 0 })
   }
 
   return (
     <>
+      {contextHolder}
       <Flex gap={"small"} justify="space-around" style={{ marginLeft: "10%", marginRight: "10%" }} wrap vertical>
         <Card title="Información de la materia">
           <Row gutter={16}>
