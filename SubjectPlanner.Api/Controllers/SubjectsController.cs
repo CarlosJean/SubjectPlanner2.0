@@ -30,10 +30,10 @@ namespace SubjectPlanner.Api.Controllers
                     ClassDays = calculation.ClassDays.ToString(),
                     calculation.Holidays,
                 });
-            } catch (System.Exception ex) {
+            } catch (System.Exception) {
                 return BadRequest(new {
                     Ok = false,
-                    ex.Message
+                    Message = "Ocurrió un error al intentar realizar la operación."
                 });
             }
         }
