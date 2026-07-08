@@ -20,7 +20,7 @@ builder.Services.AddCors(options =>
                       {
                           policy.WithOrigins(builder.Configuration.GetValue<string>("WebBaseUrl") ?? "")
                           .WithMethods("GET", "POST")
-                          .WithHeaders("Content-Type", "application/json");
+                          .WithHeaders("Content-Type");
                       });
 });
 
