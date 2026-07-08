@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using SubjectPlanner.Core;
+using SubjectPlanner.Core.Exceptions;
 using SubjectPlanner.Core.Helpers;
 using SubjectPlanner.Core.Services;
 
@@ -164,5 +165,32 @@ public class SubjectServiceTests
         Assert.Equal(subject.StartDate, result.EndDate);
         Assert.Equal(0, result.ClassDays);
         Assert.Equal([], result.Holidays);
+    }
+
+    [Fact]
+    public void Calculate_CeroHoursSchedule_ThrowsWrongScheduleException()
+    {
+        //Arrange
+        Subject subject = new()
+        {
+            Hours = 1,
+            StartDate = new DateTime(2017, 04, 19),
+            Schedules = [
+                new Schedule {
+                    Day = DayOfWeek.Wednesday,
+                    HourFrom = new TimeOnly(08, 00),
+                    HourTo = new TimeOnly(07, 00),
+                }
+            ]
+        };
+
+        HolidaysService holidayService = new(_config)
+        {
+            Schedules = subject.Schedules
+        };
+        SubjectService subjectService = new(holidayService);
+        //End arrange
+
+        var exception = Assert.Throws<WrongScheduleException>(() => subjectService.Calculate(subject));        
     }
 }

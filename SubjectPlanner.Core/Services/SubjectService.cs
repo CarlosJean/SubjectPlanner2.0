@@ -1,3 +1,4 @@
+using SubjectPlanner.Core.Exceptions;
 using SubjectPlanner.Core.Helpers;
 
 namespace SubjectPlanner.Core.Services;
@@ -14,8 +15,15 @@ public partial class SubjectService
     {
         try
         {
-            if (subject.Hours < 0) return new CalculationResult{ ClassDays = 0, EndDate = subject.StartDate, Holidays = []};
-            
+            int invalidSchedules = subject?
+                .Schedules?
+                .Where(s => s.HourFrom > s.HourTo)
+                .Count() ?? 0;
+
+            if (invalidSchedules > 0) { throw new WrongScheduleException("Los cantidad de horas entre los horarios debería ser mayor a cero."); }
+
+            if (subject.Hours < 0) return new CalculationResult();
+
             //Ordenar los días de la semana
             subject.Schedules = subject?.Schedules?
                 .OrderBy(s => s.Day)?
@@ -113,7 +121,7 @@ public partial class SubjectService
     {
         try
         {
-            CalculationResult calculation = new();  
+            CalculationResult calculation = new();
             bool isThereAnyHoliday = false;
             double initialHours = subject.Hours;
             double affectingHours = 0;
