@@ -1,3 +1,4 @@
+using Serilog;
 using SubjectPlanner.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,17 +13,22 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-var  MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy  =>
+                      policy =>
                       {
                           policy.WithOrigins(builder.Configuration.GetValue<string>("WebBaseUrl") ?? "")
                           .WithMethods("GET", "POST")
                           .WithHeaders("Content-Type");
                       });
 });
+
+builder.Services.AddSerilog((services, lc) => lc
+    .ReadFrom.Configuration(builder.Configuration)
+    .ReadFrom.Services(services)
+    .Enrich.FromLogContext());
 
 var app = builder.Build();
 

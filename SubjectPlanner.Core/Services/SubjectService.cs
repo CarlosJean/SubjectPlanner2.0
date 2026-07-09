@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using SubjectPlanner.Core.Exceptions;
 using SubjectPlanner.Core.Helpers;
 
@@ -6,10 +7,12 @@ namespace SubjectPlanner.Core.Services;
 public partial class SubjectService
 {
     private readonly HolidaysService _holidayService;
+    private readonly ILogger<SubjectService> _logger;
 
-    public SubjectService(HolidaysService holidaysService)
+    public SubjectService(HolidaysService holidaysService, ILogger<SubjectService> logger)
     {
         _holidayService = holidaysService;
+        _logger = logger;
     }
     private CalculationResult GetDays(Subject subject)
     {
@@ -76,6 +79,8 @@ public partial class SubjectService
                             .AddMinutes((mins - passedHours) * 60)
                     );
 
+                    _logger.LogInformation("Ya se generó el resultado");
+
                     return new CalculationResult
                     {
                         EndDate = endDate,
@@ -87,6 +92,8 @@ public partial class SubjectService
                 Schedule nextSchedule = subject.Schedules[i + 1];
                 days += nextSchedule.Day - schedule.Day;
             }
+
+            
 
             return new CalculationResult
             {
