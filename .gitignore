@@ -3,3 +3,4 @@ SubjectPlanner.Api/appsettings.json
 obj/
 bin/
 logs
+.vs
