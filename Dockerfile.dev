@@ -1,0 +1,8 @@
+# Dotnet Core
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+RUN mkdir -p /app
+ENV ASPNETCORE_ENVIRONMENT=Development
+COPY . .
+WORKDIR /app/SubjectPlanner.Api
+EXPOSE 80
+CMD ["dotnet", "watch", "run", "--urls", "http://0.0.0.0:80"]

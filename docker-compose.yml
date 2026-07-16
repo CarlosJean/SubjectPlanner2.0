@@ -1,0 +1,31 @@
+services:
+  subjectplanner-api:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5000:80"
+    volumes: 
+      - .:/app
+      - /app/SubjectPlanner.Api/obj
+      - /app/SubjectPlanner.Api/bin
+    environment:
+      - DOTNET_USE_POLLING_FILE_WATCHER=1
+  
+
+# NUEVO: Servicio de React (Frontend)
+  subjectplanner-web:
+    build:
+      context: ./SubjectPlanner.Web # Asumiendo este nombre de carpeta
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173" # Mapeo estándar para React/Node [1, 2, 6]
+    volumes:
+      - ./SubjectPlanner.Web:/app # Sincroniza el código de React [2, 3]
+      - /app/node_modules/ # Volumen anónimo para aislar dependencias [4]
+    # Si tu API necesita comunicarse con el front, puedes usar links
+    links:
+      - subjectplanner-api
+    environment:
+      - WATCHPACK_POLLING=true             # For Webpack/CRA hot reload
+      - CHOKIDAR_USEPOLLING=true           # For general file watching

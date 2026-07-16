@@ -1,0 +1,5 @@
+SubjectPlanner.Api/appsettings.Development.json
+SubjectPlanner.Api/appsettings.json
+obj/
+bin/
+logs
