@@ -1,0 +1,56 @@
+{
+  "WebBaseUrl": "[Web URL]",
+  "Holidays": [
+    {
+      "Date": "0001-01-01"
+    },
+    {
+      "Date": "0001-01-21",
+      "IsReligious": true
+    },
+    {
+      "Date": "0001-01-26"
+    },
+    {
+      "Date": "0001-02-27"
+    },
+    {
+      "Date": "0001-05-01"
+    },
+    {
+      "Date": "0001-08-16"
+    },
+    {
+      "Date": "0001-09-24",
+      "IsReligious": true
+    },
+    {
+      "Date": "0001-11-06"
+    },
+    {
+      "Date": "0001-12-25",
+      "IsReligious": true
+    }
+  ],
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft.AspNetCore.Mvc": "Warning",
+        "Microsoft.AspNetCore.Routing": "Warning",
+        "Microsoft.AspNetCore.Hosting": "Warning"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "File",
+        "Args": {
+          "path": "./logs/log-.txt",
+          "rollingInterval": "Day",
+          "shared": true
+        }
+      }
+    ]
+  },
+  "AllowedHosts": "*"
+}
